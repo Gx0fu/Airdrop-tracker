@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List & Airdrop Tracker</title>
+    <script type="module">
+        // Import Firebase langsung dari CDN (tanpa NPM)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXmMElO1jhkhS2G1BjezwxUOT8LAuBfFg",
+            authDomain: "airdrop-tracker-28038.firebaseapp.com",
+            projectId: "airdrop-tracker-28038",
+            storageBucket: "airdrop-tracker-28038.firebasestorage.app",
+            messagingSenderId: "711646425289",
+            appId: "1:711646425289:web:9c5fb23602f0823cdf1d18",
+            measurementId: "G-MC1EP0Y3ZQ"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Tambah To-Do List ke Firebase
+        async function addTodo() {
+            const task = document.getElementById("todo-input").value;
+            if (task) {
+                await addDoc(collection(db, "todos"), { task });
+                document.getElementById("todo-input").value = "";
+                loadData(); // Refresh data
+            }
+        }
+
+        // Tambah Airdrop ke Firebase
+        async function addAirdrop() {
+            const airdrop = document.getElementById("airdrop-input").value;
+            if (airdrop) {
+                await addDoc(collection(db, "airdrops"), { airdrop });
+                document.getElementById("airdrop-input").value = "";
+                loadData(); // Refresh data
+            }
+        }
+
+        // Ambil Data dari Firebase
+        async function loadData() {
+            document.getElementById("todo-list").innerHTML = "";
+            const todos = await getDocs(collection(db, "todos"));
+            todos.forEach(doc => {
+                let li = document.createElement("li");
+                li.textContent = doc.data().task;
+                document.getElementById("todo-list").appendChild(li);
+            });
+
+            document.getElementById("airdrop-list").innerHTML = "";
+            const airdrops = await getDocs(collection(db, "airdrops"));
+            airdrops.forEach(doc => {
+                let li = document.createElement("li");
+                li.textContent = doc.data().airdrop;
+                document.getElementById("airdrop-list").appendChild(li);
+            });
+        }
+
+        window.onload = loadData; // Muat data saat halaman dibuka
+    </script>
+</head>
+<body>
+    <h2>To-Do List</h2>
+    <input type="text" id="todo-input" placeholder="Tambahkan tugas">
+    <button onclick="addTodo()">Tambah</button>
+    <ul id="todo-list"></ul>
+
+    <h2>Airdrop Tracker</h2>
+    <input type="text" id="airdrop-input" placeholder="Nama Airdrop">
+    <button onclick="addAirdrop()">Tambah</button>
+    <ul id="airdrop-list"></ul>
+</body>
+</html>
